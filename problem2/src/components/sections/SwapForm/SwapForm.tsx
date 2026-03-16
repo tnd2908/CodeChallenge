@@ -1,11 +1,20 @@
 import useForm from "../../../hooks/useForm";
-import { Button, Combobox, Input } from "../../ui";
+import { Button, Combobox, ErrorMessages, Input, ExchangeRate } from "../../ui";
 
 const SwapForm = () => {
-    const { currenciesData, handleChange, values, handleReverse, isLoading, handleSubmit, swapResult } = useForm({
+    const { 
+        currenciesData, 
+        handleChange, 
+        values, 
+        handleReverse, 
+        isLoading, 
+        handleSubmit, 
+        swapResult, 
+        errors, 
+    } = useForm({
         from: '',
         to: '',
-        amount: '',
+        amount: 0,
     });
 
     return (
@@ -14,7 +23,8 @@ const SwapForm = () => {
                 <div className="from-blue-400 space-y-4 md:pr-12 md:py-4 px-4 py-8 rounded-lg to-blue-500 bg-linear-to-r">
                     <Combobox placeholder="From Currency" label="From Currency" name="from" options={currenciesData} value={values.from} disabledOption={values.to} onChange={(value) => handleChange(value)} />
                     <span className="block text-white text-sm font-semibold">You Pay</span>
-                    <Input onChange={handleChange} className="bg-white" min={0} name="amount" type="number" placeholder="Amount" />
+                    <Input value={values.amount} onChange={handleChange} className="bg-white" min={0} name="amount" type="number" placeholder="Amount" />
+                    <ExchangeRate value={values} swapResult={swapResult} variant="from" />
                 </div>
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                     <button type="button" onClick={handleReverse} className="bg-white cursor-pointer hover:rotate-180 transition-all duration-300 border-4 p-2 border-slate-900 size-14 rounded-full flex items-center justify-center">
@@ -25,9 +35,11 @@ const SwapForm = () => {
                     <Combobox placeholder="To Currency" label="To Currency" name="to" options={currenciesData} value={values.to} disabledOption={values.from} onChange={(value) => handleChange(value)} />
                     <span className="block text-white text-sm font-semibold">You Receive</span>
                     <Input disabled value={swapResult} className="bg-white" min={0} name="amount" type="number" placeholder="You Receive" />
+                    <ExchangeRate value={values} swapResult={swapResult} variant="to" />
                 </div>
             </div>
-            <Button type="submit" isLoading={isLoading}>Convert</Button>
+            <ErrorMessages errors={errors} />
+            <Button type="submit" isLoading={isLoading}>Send Now</Button>
         </form>
     )
 }

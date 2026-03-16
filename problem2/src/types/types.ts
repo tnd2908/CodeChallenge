@@ -7,5 +7,5 @@ export interface ICurrency {
 export interface FormValues {
     from: string;
     to: string;
-    amount: string;
+    amount: number;
 }

@@ -1,6 +1,7 @@
 import { useState, useMemo, type ChangeEvent, useEffect, type FormEvent } from 'react';
 import type { ICurrency, FormValues } from '../types/types';
 import getCurrency from '../services/currency.service';
+import { delay } from '../ultils/delay';
 
 interface UseFormReturn {
     values: FormValues;
@@ -19,11 +20,22 @@ const useForm = (initialValues: FormValues): UseFormReturn => {
     const [currenciesData, setCurrenciesData] = useState<ICurrency[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
-    const validate = (name: string, value: string): string => {
-        if (name === 'amount') {
-            if (!value) return 'Amount is required';
-            const num = Number(value);
-            if (Number.isNaN(num) || num <= 0) return 'Invalid amount';
+    const validate = (name: string, value: string | number): string => {
+        switch (name) {
+            case 'amount':
+                {
+                    const num = Number(value);
+                    if (Number.isNaN(num) || num <= 0) {
+                        return 'Invalid amount';
+                    }
+                    break;
+                }
+            case 'from':
+            case 'to':
+                if (!value) {
+                    return 'Currency is required';
+                }
+                break;
         }
         return '';
     };
@@ -43,26 +55,29 @@ const useForm = (initialValues: FormValues): UseFormReturn => {
             to: prev.from
         }));
     };
+    const validateForm = (): boolean => {
+        const amountError = validate('amount', values.amount);
+        const fromError = validate('from', values.from);
+        const toError = validate('to', values.to);
+
+        setErrors({
+            ...(amountError && { amount: amountError }),
+            ...(fromError && { from: fromError }),
+            ...(toError && { to: toError }),
+        });
+
+        return !amountError && !fromError && !toError;
+    };
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
-        const amountError = validate('amount', values.amount);
-        const hasErrors = amountError || !values.from || !values.to;
-        if (amountError) {
-            setErrors(prev => ({ ...prev, amount: amountError }));
-        }
-        if (hasErrors) {
-            return;
-        }
-
-        const fromCurrency = currenciesData?.find(c => c.currency === values.from);
-        const toCurrency = currenciesData?.find(c => c.currency === values.to);
-        const amount = Number(values.amount);
-        const result = fromCurrency && toCurrency && amount > 0
-            ? (amount * fromCurrency.price) / toCurrency.price
-            : 0;
-        console.log(result);
+        if (!validateForm()) return;
+        setIsLoading(true);
+        delay(1000).then(() => {
+            alert(`You will receive ${swapResult} ${values.to}`);
+            setIsLoading(false);
+            setValues((prev) => ({ ...prev, amount: 0 }));
+        });
     };
 
     useEffect(() => {
@@ -87,10 +102,12 @@ const useForm = (initialValues: FormValues): UseFormReturn => {
         const amount = Number(values.amount);
 
         if (fromCurrency && toCurrency && amount > 0) {
-            return (amount * fromCurrency.price) / toCurrency.price;
+            return Number(((amount * fromCurrency.price) / toCurrency.price).toFixed(2));
         }
         return 0;
     }, [values, currenciesData]);
+
+    
 
     return {
         values,

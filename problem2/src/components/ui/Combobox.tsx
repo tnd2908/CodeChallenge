@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 interface Option {
     currency: string;
@@ -35,12 +35,14 @@ const Combobox: React.FC<ComboboxProps> = ({
         );
     }, [options, query]);
 
-    const handleSelect = (currency: string) => {
-        if (currency === disabledOption) return;
+    const handleSelect = useCallback((currency: string) => {
+        if (currency === disabledOption) {
+            return;
+        }
         onChange({ target: { name, value: currency } } as React.ChangeEvent<HTMLInputElement>);
         setQuery('');
         setIsOpen(false);
-    };
+    }, [name, disabledOption, onChange]);
 
     return (
         <div className={`flex flex-col space-y-3 gap-1.5 relative ${className}`}>

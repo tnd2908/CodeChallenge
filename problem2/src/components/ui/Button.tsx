@@ -5,6 +5,7 @@ const Button: React.FC<ButtonProps> = ({ children, isLoading, ...props }) => {
     const buttonStyles = `
     bg-yellow-500 w-full py-3 rounded-lg cursor-pointer transition-all uppercase font-semibold duration-300 border p-2 border-slate-900 flex items-center justify-center
     ${props.className}
+    disabled:opacity-50 disabled:cursor-not-allowed
     `;
     return (
         <button 
