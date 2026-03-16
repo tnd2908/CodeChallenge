@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 interface Option {
     currency: string;
@@ -28,6 +28,7 @@ const Combobox: React.FC<ComboboxProps> = ({
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [query, setQuery] = useState('');
+    const containerRef = useRef<HTMLDivElement>(null);
 
     const filteredOptions = useMemo(() => {
         return options.filter((opt) =>
@@ -44,8 +45,19 @@ const Combobox: React.FC<ComboboxProps> = ({
         setIsOpen(false);
     }, [name, disabledOption, onChange]);
 
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+          if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+            setIsOpen(false);
+            setQuery('');
+          }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+      }, []);
+
     return (
-        <div className={`flex flex-col space-y-3 gap-1.5 relative ${className}`}>
+        <div ref={containerRef} className={`flex flex-col space-y-3 gap-1.5 relative ${className}`}>
             {label && <span className="text-sm font-medium text-white">{label}</span>}
 
             <div className="relative">

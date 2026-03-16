@@ -18,7 +18,8 @@ const SwapForm = () => {
     });
 
     return (
-        <form onSubmit={handleSubmit} className="relative p-2 space-y-4 rounded-lg shadow">
+        <form onSubmit={handleSubmit} className="relative p-2 space-y-4 w-full rounded-lg shadow">
+            <h1 className="text-2xl md:text-4xl uppercase pb-4 font-bold text-white text-center">Currency Converter</h1>
             <div className="relative grid md:grid-cols-2 gap-4">
                 <div className="from-blue-400 space-y-4 md:pr-12 md:py-4 px-4 py-8 rounded-lg to-blue-500 bg-linear-to-r">
                     <Combobox placeholder="From Currency" label="From Currency" name="from" options={currenciesData} value={values.from} disabledOption={values.to} onChange={(value) => handleChange(value)} />
@@ -39,7 +40,7 @@ const SwapForm = () => {
                 </div>
             </div>
             <ErrorMessages errors={errors} />
-            <Button type="submit" isLoading={isLoading}>Send Now</Button>
+            <Button type="submit" isLoading={isLoading}>Send Money Now</Button>
         </form>
     )
 }
